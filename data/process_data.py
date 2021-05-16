@@ -6,16 +6,16 @@ def load_data(messages_filepath, categories_filepath):
     messages = pd.read_csv(messages_filepath) 
     categories = pd.read_csv(categories_filepath) 
     # merge datasets
-    df = messages.merge(categories, on = 'id')
+    df = messages.merge(categories, on = 'id').set_index('id')
     df.drop_duplicates(inplace=True)
-    # print(df.shape, df.columns)
+    #print('loaded:', df.shape, df.columns)
+    #print(df.head())
     return df
 
 
 def clean_data(df):
     # transform categories dataset
     # create a dataframe of the 36 individual category columns
-    categories_raw = df[['id','categories']].copy()
     categories = df['categories'].str.split(';', expand=True)
     # create the categories columns names
     row = categories.iloc[0]
@@ -28,14 +28,14 @@ def clean_data(df):
         categories[column] = categories[column].str.split('-').str.get(1)
         # convert column from string to numeric
         categories[column] = pd.to_numeric(categories[column])
-    # replace categories column in dataframe with new category columns
-    categories = categories_raw.join(categories)
-    categories.drop(columns = 'categories', inplace=True)
-    # merge the expanded categories dataset
-    df = df.merge(categories, on = 'id')
+
+    # merge datasets
+    df = df.join(categories).drop(columns = 'categories')
+
     # drop duplicates
     df.drop_duplicates(inplace=True)
-    # print(df.shape)
+    #print('cleaned:', df.shape)
+    #print(df.head())
     
     return df
 
