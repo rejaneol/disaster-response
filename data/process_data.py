@@ -3,6 +3,18 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    DESCRIPTION:
+    A function to load and merge the data from messages and target disaster categories 
+        
+    INPUT:
+    messages_filepath - a csv file with message data
+    categories_filepath - a csv file with categories data
+    
+    OUTPUT:
+    df - a dataframe with merge datasets from messages and categories
+    '''
+        
     messages = pd.read_csv(messages_filepath) 
     categories = pd.read_csv(categories_filepath) 
     # merge datasets
@@ -14,6 +26,17 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''
+    DESCRIPTION:
+    A function to clean the data from merged messages and categories datasets by transformed categories column in to one-hot encoded target columns
+        
+    INPUT:
+    df - a dataframe with merge datasets from messages and categories
+    
+    OUTPUT:
+    df - a dataframe with cleaned lines and one-hot encoded disaster categories
+    '''
+        
     # transform categories dataset
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(';', expand=True)
@@ -41,6 +64,16 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''
+    DESCRIPTION:
+    A function to save the cleaned and transformed dataframe in a sql table
+        
+    INPUT:
+    df - a dataframe with cleaned and transformed dataset
+    database_filename - a database where the data is stored
+   
+    '''
+        
     url = 'sqlite:///' + str(database_filename)
     engine = create_engine(url)
     df.to_sql('messages', engine, index=False, if_exists='replace')  #if_exists='append'
