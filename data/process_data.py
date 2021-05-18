@@ -45,18 +45,20 @@ def clean_data(df):
     category_colnames = row.str.split('-').str.get(0)
     # rename the columns of `categories`
     categories.columns = category_colnames
-    # convert category values to just numbers 0 or 1
+    # convert category values to just numbers 0 or 1 and drop others
     for column in categories:
         # set each value to be the last character of the string
         categories[column] = categories[column].str.split('-').str.get(1)
         # convert column from string to numeric
         categories[column] = pd.to_numeric(categories[column])
+        categories = categories[(categories[column] == 0) | (categories[column] == 1)].copy()
 
     # merge datasets
-    df = df.join(categories).drop(columns = 'categories')
+    df = df.join(categories, how='inner').drop(columns = 'categories')
 
     # drop duplicates
-    df.drop_duplicates(inplace=True)
+    df.drop_duplicates(inplace=True)  
+       
     #print('cleaned:', df.shape)
     #print(df.head())
     
